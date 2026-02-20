@@ -17,7 +17,7 @@ namespace TestProject1
 
         // din lokale database
         private const string connectionString =
-            "Server=(localdb)\\MSSQLLocalDB;Database=BottleDb;Trusted_Connection=True;TrustServerCertificate=True;";
+            "Server=(localdb)\\MSSQLLocalDB;Database=Bottles;Trusted_Connection=True;TrustServerCertificate=True;";
 
 
         public IRepoBottlesTests()
