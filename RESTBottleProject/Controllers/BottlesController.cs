@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using RESTBottleProject.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -7,6 +9,7 @@ namespace RESTBottleProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BottlesController : ControllerBase
     {
         private IBottlesRepository _repo; 
@@ -17,23 +20,36 @@ namespace RESTBottleProject.Controllers
         }
         // GET: api/<BottlesController>
         [HttpGet]
-        public IEnumerable<Bottle> Get()
+        public IEnumerable<Bottle> Get([FromQuery] string substring)
         {
-            return _repo.GetAllBottles(); 
+            return _repo.GetAllBottles(substring); 
         }
 
         // GET api/<BottlesController>/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
-        public Bottle? Get(int id)
+        public ActionResult<Bottle> Get(int id)
         {
-            return _repo.GetBottleById(id);
+            var bottle = _repo.GetBottleById(id);
+            if (bottle == null) return NotFound("No such bottle, id: " + id);
+            return Ok(bottle);
         }
 
         // POST api/<BottlesController>
         [HttpPost]
-        public Bottle? Post([FromBody] Bottle newBottle)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Bottle> Post([FromBody] Bottle newBottle)
         {
-            return _repo.AddBottle(newBottle);
+            try
+            { _repo.AddBottle(newBottle);
+                return Created($"api/items/{newBottle.Id}", newBottle);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT api/<BottlesController>/5

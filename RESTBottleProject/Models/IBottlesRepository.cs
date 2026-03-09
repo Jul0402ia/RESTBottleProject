@@ -10,7 +10,7 @@ namespace RESTBottleProject.Models
             string? descriptionStartsWith = null,
             string? sortOrder = null);
 
-        IEnumerable<Bottle> GetAllBottles();
+        IEnumerable<Bottle> GetAllBottles(string substring);
         Bottle? GetBottleById(int id);
         Bottle? RemoveBottle(int id);
         Bottle? UpdateBottle(int id, Bottle updatedBottle);
